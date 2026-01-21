@@ -1,0 +1,93 @@
+sources:
+  chinook:
+    database: chinook
+    host: localhost
+    kind: postgres
+    password: ${DB_PASSWORD_POSTGRES}
+    port: 5432
+    user: root
+  customer:
+    database: classicmodels
+    host: localhost
+    kind: mysql
+    password: ${DB_PASSWORD_MYSQL}
+    port: 3306
+    user: root
+  superheroes:
+    database: /Users/awaiskamran/downloads/superheroes.db
+    kind: sqlite
+tools:
+  chinook_describe_table:
+    description: Describe columns in a table of chinook
+    kind: postgres-sql
+    parameters:
+    - description: Name of table to inspect
+      name: table
+      type: string
+    source: chinook
+    statement: SELECT column_name, data_type FROM information_schema.columns WHERE
+      table_name = $1;
+  chinook_execute_query:
+    description: Execute arbitrary SQL on chinook within the 'sql' parameter
+    kind: postgres-execute-sql
+    source: chinook
+  chinook_list_tables:
+    description: List tables in chinook
+    kind: postgres-sql
+    source: chinook
+    statement: SELECT table_name FROM information_schema.tables WHERE table_schema='public';
+  customer_describe_table:
+    description: Describe columns in a table of customer
+    kind: mysql-sql
+    parameters:
+    - description: Name of table to inspect
+      name: table
+      type: string
+    source: customer
+    statement: SELECT column_name, data_type FROM information_schema.columns WHERE
+      table_name = ?;
+  customer_execute_query:
+    description: Execute arbitrary SQL on customer within the 'sql' parameter
+    kind: mysql-execute-sql
+    source: customer
+  customer_list_tables:
+    description: List tables in customer
+    kind: mysql-sql
+    source: customer
+    statement: SHOW TABLES;
+  superheroes_describe_table:
+    description: Describe columns in a table of superheroes
+    kind: sqlite-sql
+    source: superheroes
+    statement: PRAGMA table_info({{.table}});
+    templateParameters:
+    - description: Name of table to inspect
+      name: table
+      type: string
+  superheroes_execute_query:
+    description: Execute arbitrary SQL on superheroes within the 'sql' parameter
+    kind: sqlite-sql
+    source: superheroes
+    statement: '{{.sql}};'
+    templateParameters:
+    - description: SQL query to execute
+      name: sql
+      type: string
+  superheroes_list_tables:
+    description: List tables in superheroes
+    kind: sqlite-sql
+    source: superheroes
+    statement: SELECT name FROM sqlite_master WHERE type='table';
+toolsets:
+  chinook_toolset:
+  - chinook_list_tables
+  - chinook_describe_table
+  - chinook_execute_query
+  customer_toolset:
+  - customer_list_tables
+  - customer_describe_table
+  - customer_execute_query
+  superheroes_toolset:
+  - superheroes_list_tables
+  - superheroes_describe_table
+  - superheroes_execute_query
